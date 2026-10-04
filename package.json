@@ -1,0 +1,26 @@
+{
+  "name": "thesis-soa-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:gateway": "node api-gateway/server.js",
+    "start:student": "node student-service/server.js",
+    "start:topic": "node topic-service/server.js",
+    "start:registration": "node registration-service/server.js",
+    "dev": "concurrently \"npm run start:student\" \"npm run start:topic\" \"npm run start:registration\" \"npm run start:gateway\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

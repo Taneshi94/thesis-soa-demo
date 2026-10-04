@@ -1,0 +1,15 @@
+# Loại bỏ node_modules ở tất cả dịch vụ
+node_modules/
+*/node_modules/
+
+# Loại bỏ các file dữ liệu SQLite
+*.db
+*.sqlite
+
+# Loại bỏ file môi trường
+.env
+
+# Loại bỏ file log và cache
+*.log
+.DS_Store
+.vscode/
