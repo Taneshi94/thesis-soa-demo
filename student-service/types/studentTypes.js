@@ -16,4 +16,11 @@
  * @property {string} email
  */
 
+/**
+ * Payload khi cập nhật sinh viên (Request Body)
+ * @typedef {Object} UpdateStudentDTO
+ * @property {string} hoTen
+ * @property {string} lop
+ * @property {string} email
+ */
 module.exports = {};

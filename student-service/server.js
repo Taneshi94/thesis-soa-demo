@@ -9,7 +9,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-app.use('/', studentRoutes);
+app.use('/api/students', studentRoutes);
 
 app.use(errorHandler);
 

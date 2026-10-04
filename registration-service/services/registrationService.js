@@ -6,17 +6,46 @@ const STUDENT_SERVICE_URL = process.env.STUDENT_SERVICE_URL || 'http://localhost
 const TOPIC_SERVICE_URL = process.env.TOPIC_SERVICE_URL || 'http://localhost:3002';
 
 /**
+ * Định nghĩa kiểu dữ liệu phản hồi từ Student Service
+ * @typedef {Object} StudentApiResponse
+ * @property {boolean} success
+ * @property {{ mssv: string, hoTen: string, lop: string, email: string }} data
+ */
+
+/**
+ * Định nghĩa kiểu dữ liệu phản hồi từ Topic Service
+ * @typedef {Object} TopicApiResponse
+ * @property {boolean} success
+ * @property {{ maDeTai: string, tenDeTai: string, moTa: string, giangVienHuongDan: string, trangThai: string }} data
+ */
+
+/**
  * @implements {IRegistrationService}
  */
 class RegistrationService extends IRegistrationService {
   /**
-   * @returns {Promise<import('../types/registrationTypes').RegistrationEntity[]>}
+   * Lấy danh sách tất cả các phiếu đăng ký
+   * @returns {import('../types/registrationTypes').RegistrationEntity[]}
    */
-  static async getAllRegistrations() {
+  static getAllRegistrations() {
     return RegistrationModel.findAll();
   }
 
   /**
+   * Lấy chi tiết phiếu đăng ký theo mã
+   * @param {string} maDangKy
+   * @returns {import('../types/registrationTypes').RegistrationEntity}
+   */
+  static getByMaDangKy(maDangKy) {
+    const registration = RegistrationModel.findByMaDangKy(maDangKy);
+    if (!registration) {
+      throw new AppError(`Không tìm thấy đăng ký với mã: ${maDangKy}`, 404);
+    }
+    return registration;
+  }
+
+  /**
+   * Đăng ký đề tài (Gọi API liên dịch vụ tới Student & Topic Services)
    * @param {import('../types/registrationTypes').CreateRegistrationDTO} dto
    * @returns {Promise<import('../types/registrationTypes').RegistrationEntity>}
    */
@@ -26,24 +55,38 @@ class RegistrationService extends IRegistrationService {
     }
 
     // 1. Kiểm tra sinh viên từ Student Service
-    const studentRes = await fetch(`${STUDENT_SERVICE_URL}/students/${dto.mssv}`);
-    if (!studentRes.ok) {
-      throw new AppError('Sinh viên không tồn tại trong hệ thống', 400);
+    /** @type {StudentApiResponse} */
+    let studentData;
+    try {
+      const studentRes = await fetch(`${STUDENT_SERVICE_URL}/api/students/${dto.mssv}`);
+      if (!studentRes.ok) {
+        throw new AppError(`Sinh viên ${dto.mssv} không tồn tại trong hệ thống`, 404);
+      }
+      studentData = /** @type {StudentApiResponse} */ (await studentRes.json());
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError('Không thể kết nối tới Student Service', 500);
     }
-    const studentData = await studentRes.json();
 
     // 2. Kiểm tra đề tài từ Topic Service
-    const topicRes = await fetch(`${TOPIC_SERVICE_URL}/topics/${dto.maDeTai}`);
-    if (!topicRes.ok) {
-      throw new AppError('Đề tài không tồn tại trong hệ thống', 400);
+    /** @type {TopicApiResponse} */
+    let topicData;
+    try {
+      const topicRes = await fetch(`${TOPIC_SERVICE_URL}/api/topics/${dto.maDeTai}`);
+      if (!topicRes.ok) {
+        throw new AppError(`Đề tài ${dto.maDeTai} không tồn tại trong hệ thống`, 404);
+      }
+      topicData = /** @type {TopicApiResponse} */ (await topicRes.json());
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError('Không thể kết nối tới Topic Service', 500);
     }
-    const topicData = await topicRes.json();
 
     if (topicData.data.trangThai !== 'ConMo') {
-      throw new AppError('Đề tài hiện không thể đăng ký', 400);
+      throw new AppError('Đề tài hiện không thể đăng ký (Đã đóng hoặc đã có sinh viên đăng ký)', 400);
     }
 
-    // 3. Khởi tạo đối tượng lưu CSDL
+    // 3. Khởi tạo đối tượng và lưu CSDL
     /** @type {import('../types/registrationTypes').RegistrationEntity} */
     const record = {
       maDangKy: `DK${Date.now()}`,
@@ -57,14 +100,50 @@ class RegistrationService extends IRegistrationService {
 
     RegistrationModel.create(record);
 
-    // 4. Cập nhật trạng thái đề tài sang 'DaDangKy'
-    await fetch(`${TOPIC_SERVICE_URL}/topics/${dto.maDeTai}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ trangThai: 'DaDangKy' })
-    });
+    // 4. Cập nhật trạng thái đề tài sang 'DaDangKy' thông qua Topic Service
+    try {
+      await fetch(`${TOPIC_SERVICE_URL}/api/topics/${dto.maDeTai}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...topicData.data,
+          trangThai: 'DaDangKy'
+        })
+      });
+    } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái đề tài tại Topic Service:', error);
+    }
 
     return record;
+  }
+
+  /**
+   * Cập nhật thông tin phiếu đăng ký
+   * @param {string} maDangKy
+   * @param {import('../types/registrationTypes').UpdateRegistrationDTO} dto
+   * @returns {import('../types/registrationTypes').RegistrationEntity}
+   */
+  static updateRegistration(maDangKy, dto) {
+    this.getByMaDangKy(maDangKy); // Kiểm tra tồn tại
+    RegistrationModel.update(maDangKy, dto);
+    return this.getByMaDangKy(maDangKy);
+  }
+
+  static async syncStudentInfo(mssv, tenSinhVien) {
+    return RegistrationModel.updateStudentInfo(mssv, tenSinhVien);
+  }
+
+  static async syncTopicInfo(maDeTai, tenDeTai) {
+    return RegistrationModel.updateTopicInfo(maDeTai, tenDeTai);
+  }
+
+  /**
+   * Xóa phiếu đăng ký
+   * @param {string} maDangKy
+   */
+  static deleteRegistration(maDangKy) {
+    this.getByMaDangKy(maDangKy); // Kiểm tra tồn tại
+    RegistrationModel.delete(maDangKy);
   }
 }
 

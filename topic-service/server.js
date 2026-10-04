@@ -9,7 +9,7 @@ const PORT = 3002;
 app.use(cors());
 app.use(express.json());
 
-app.use('/', topicRoutes);
+app.use('/api/topics', topicRoutes);
 
 app.use(errorHandler);
 

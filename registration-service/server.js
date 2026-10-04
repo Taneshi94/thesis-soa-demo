@@ -9,7 +9,7 @@ const PORT = 3003;
 app.use(cors());
 app.use(express.json());
 
-app.use('/', registrationRoutes);
+app.use('/api/registrations', registrationRoutes);
 
 app.use(errorHandler);
 

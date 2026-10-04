@@ -1,58 +1,35 @@
 const express = require('express');
-const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const { errorHandler } = require('./errorHandler');
+const serviceRegistry = require('./config/serviceRegistry');
+const proxyRoutes = require('./routes/proxyRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Cố định Port 3000, không sử dụng dotenv
 
-app.use(cors());
+app.use(express.json());
 
-async function startServer() {
-  // Nạp động ESM module trong môi trường CommonJS
-  const { createProxyMiddleware } = await import('http-proxy-middleware');
-
-  // 1. Health check endpoint cho Gateway (Test trực tiếp trên web http://localhost:3000/)
-  app.get('/', (req, res) => {
-    res.json({
-      success: true,
-      message: 'API Gateway đang chạy thành công!',
-      endpoints: {
-        students: 'http://localhost:3000/students',
-        topics: 'http://localhost:3000/topics',
-        registrations: 'http://localhost:3000/registrations'
-      }
-    });
-  });
-
-  // 2. Proxy sang Student Service
-  app.use('/students', createProxyMiddleware({
-    target: 'http://localhost:3001',
-    changeOrigin: true
-  }));
-
-  // 3. Proxy sang Topic Service
-  app.use('/topics', createProxyMiddleware({
-    target: 'http://localhost:3002',
-    changeOrigin: true
-  }));
-
-  // 4. Proxy sang Registration Service
-  app.use('/registrations', createProxyMiddleware({
-    target: 'http://localhost:3003',
-    changeOrigin: true
-  }));
-
-  // Middlewares & Routes nội bộ cho Gateway (Auth)
-  app.use(express.json());
-  app.use('/auth', authRoutes);
-
-  // Centralized Error Handler
-  app.use(errorHandler);
-
-  app.listen(PORT, () => {
-    console.log(`API Gateway running on port ${PORT}`);
-  });
+// Tự động kiểm tra trạng thái hoạt động (ONLINE/OFFLINE) của các Microservices
+async function checkServicesHealth() {
+  for (const service of Object.values(serviceRegistry)) {
+    try {
+      const response = await fetch(service.healthUrl, {
+        method: 'GET',
+        signal: AbortSignal.timeout(1500) // Timeout 1.5 giây
+      });
+      service.status = response.ok ? 'ONLINE' : 'DEGRADED';
+    } catch {
+      service.status = 'OFFLINE';
+    }
+  }
 }
 
-startServer();
+// Chạy kiểm tra ngay khi khởi tạo và quét định kỳ mỗi 15 giây
+checkServicesHealth();
+setInterval(checkServicesHealth, 15000);
+
+// Nối router điều hướng vào ứng dụng
+app.use('/', proxyRoutes);
+
+app.listen(PORT, () => {
+  console.log(`[API Gateway] Server đang chạy tại http://localhost:${PORT}`);
+  console.log(`[API Gateway] Xem danh sách API tại http://localhost:${PORT}/`);
+});

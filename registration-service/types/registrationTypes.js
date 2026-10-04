@@ -17,4 +17,8 @@
  * @property {string} maDeTai
  */
 
+/** * Payload khi sinh viên gửi yêu cầu cập nhật đăng ký (Request Body)
+ * @typedef {Object} UpdateRegistrationDTO
+ * @property {'ThanhCong' | 'Huy'} trangThai
+ */
 module.exports = {};
