@@ -35,18 +35,19 @@ Tất cả các truy vấn từ ứng dụng client (Frontend / Mobile / Postman
 
 * **Node.js**: `v18.0.0` trở lên
 * **npm**: `v9.0.0` trở lên
-* **SQLite3**: Driver cơ sở dữ liệu nhúng (không cần cài đặt phần mềm bên ngoài)
+* **SQLite3**: Cơ sở dữ liệu nhúng (sử dụng driver `better-sqlite3`, không cần cài đặt phần mềm quản trị CSDL bên ngoài)
 
 ### 2. Danh sách thư viện Node.js cần dùng
 
 | Thư viện | Phiên bản khuyến nghị | Phạm vi sử dụng | Mục đích |
 | --- | --- | --- | --- |
-| `express` | `^5.2.1` | Tất cả 4 Services | Web framework xây dựng RESTful API |
-| `cors` | `^2.8.5` | Tất cả 4 Services | Cho phép truy cập Cross-Origin Resource Sharing |
-| `sqlite3` | `^5.1.0` | Các Service con | Driver kết nối và thao tác với CSDL SQLite |
+| `express` | `^5.2.1` | Tất cả Services và Root Project | Web framework xây dựng RESTful API |
+| `cors` | `^2.8.6` | Tất cả Services và Root Project | Cho phép truy cập Cross-Origin Resource Sharing |
+| `better-sqlite3` | `^13.0.3` | Các Service con | Driver kết nối và thao tác CSDL SQLite hiệu năng cao |
 | `express-http-proxy` | `^2.1.1` | API Gateway | Chuyển tiếp truy vấn từ Gateway tới các Microservices |
-| `concurrently` | `^8.0.0` | Root Project | Chạy đồng thời cả 4 dịch vụ bằng 1 lệnh duy nhất |
-
+| `http-proxy-middleware` | `^4.2.0` | API Gateway | Middleware hỗ trợ định tuyến và cấu hình proxy nâng cao |
+| `dotenv` | `^18.0.5` | Tất cả Services và Root Project | Tải cấu hình biến môi trường từ file `.env` vào `process.env` |
+| `concurrently` | `^10.0.5` | Root Project | Chạy đồng thời cả 4 dịch vụ bằng 1 lệnh lệnh duy nhất |
 ---
 
 ## 🚀 Hướng dẫn Cài đặt & Khởi chạy
@@ -62,25 +63,25 @@ cd thesis-soa-demo
 
 * **Trường hợp 1: Cài đặt tập trung tại thư mục gốc**
 ```bash
-npm install express cors sqlite3 express-http-proxy concurrently
+npm install express cors better-sqlite3 express-http-proxy http-proxy-middleware dotenv concurrently
 ```
 
 * **Trường hợp 2: Quản lý riêng cho từng Service**
 ```bash
-# Tại thư mục gốc (Cài đặt tool chạy đồng thời)
-npm install concurrently --save-dev
+# Tại thư mục gốc (Cài đặt công cụ chạy đồng thời và quản lý môi trường)
+npm install concurrently dotenv --save-dev
 
 # Cài đặt cho API Gateway
-cd api-gateway && npm install express cors express-http-proxy && cd ..
+cd api-gateway && npm install express cors express-http-proxy http-proxy-middleware dotenv && cd ..
 
 # Cài đặt cho Student Service
-cd student-service && npm install express cors sqlite3 && cd ..
+cd student-service && npm install express cors better-sqlite3 dotenv && cd ..
 
 # Cài đặt cho Topic Service
-cd topic-service && npm install express cors sqlite3 && cd ..
+cd topic-service && npm install express cors better-sqlite3 dotenv && cd ..
 
 # Cài đặt cho Registration Service
-cd registration-service && npm install express cors sqlite3 && cd ..
+cd registration-service && npm install express cors better-sqlite3 dotenv && cd ..
 ```
 
 ### 3. Khởi tạo Cơ sở dữ liệu (Database Setup)
@@ -121,7 +122,7 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 | Phương thức | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/students` | Lấy danh sách tất cả sinh viên |
-| `GET` | `/api/students/:mssv` | Lấy thông tin chi tiết sinh viên theo MSSV |
+| `GET` | `/api/students/:mssv` | Lấy thông tin sinh viên theo MSSV |
 | `POST` | `/api/students` | Tạo mới sinh viên |
 | `PUT` | `/api/students/:mssv` | Cập nhật thông tin sinh viên |
 | `DELETE` | `/api/students/:mssv` | Xóa sinh viên |
@@ -131,10 +132,10 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 | Phương thức | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/topics` | Lấy danh sách tất cả đề tài |
-| `GET` | `/api/topics/:maDeTai` | Lấy thông tin chi tiết đề tài theo mã |
+| `GET` | `/api/topics/:maDeTai` | Lấy chi tiết đề tài theo mã |
 | `POST` | `/api/topics` | Tạo mới đề tài |
 | `PUT` | `/api/topics/:maDeTai` | Cập nhật thông tin đề tài |
-| `PATCH` | `/api/topics/:maDeTai/status` | Cập nhật trạng thái đề tài |
+| `PATCH` | `/api/topics/:maDeTai/status` | Cập nhật riêng trạng thái đề tài |
 | `DELETE` | `/api/topics/:maDeTai` | Xóa đề tài |
 
 ### 4. Quản lý Đăng ký & Đồng bộ (`/api/registrations`)
@@ -146,55 +147,97 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 | `POST` | `/api/registrations` | Tạo mới phiếu đăng ký đề tài |
 | `PUT` | `/api/registrations/:maDangKy` | Cập nhật phiếu đăng ký |
 | `DELETE` | `/api/registrations/:maDangKy` | Hủy/Xóa phiếu đăng ký theo mã |
-| `PATCH` | `/api/registrations/sync-student/:mssv` | *(Nội bộ)* Đồng bộ tên sinh viên |
-| `PATCH` | `/api/registrations/sync-topic/:maDeTai` | *(Nội bộ)* Đồng bộ tên đề tài |
-| `DELETE` | `/api/registrations/by-student/:mssv` | *(Nội bộ)* Xóa phiếu đăng ký theo sinh viên |
-| `DELETE` | `/api/registrations/by-topic/:maDeTai` | *(Nội bộ)* Xóa phiếu đăng ký theo đề tài |
+| `PATCH` | `/api/registrations/sync-student/:mssv` | *(Nội bộ)* Đồng bộ thông tin tên sinh viên từ Student Service |
+| `PATCH` | `/api/registrations/sync-topic/:maDeTai` | *(Nội bộ)* Đồng bộ thông tin tên đề tài từ Topic Service |
+| `DELETE` | `/api/registrations/by-student/:mssv` | *(Nội bộ)* Tự động xóa tất cả phiếu đăng ký khi sinh viên bị xóa |
+| `DELETE` | `/api/registrations/by-topic/:maDeTai` | *(Nội bộ)* Tự động xóa tất cả phiếu đăng ký khi đề tài bị xóa |
 
 ---
 
 ## 🧪 Hướng dẫn Kiểm tra API (Testing)
 
-1. **Trình duyệt Web (Chỉ hỗ trợ phương thức GET):**
-* Lấy danh mục dịch vụ: `http://localhost:3000/`
-* Lấy danh sách sinh viên: `http://localhost:3000/api/students`
-* Lấy danh sách đề tài: `http://localhost:3000/api/topics`
-* Lấy danh sách đăng ký: `http://localhost:3000/api/registrations`
+### 1. Kiểm tra trạng thái hoạt động của các Service (Service Catalog & Health Check)
 
-2. **Thunder Client / Postman (Phương thức POST / PUT / PATCH / DELETE):**
-* **Thêm mới sinh viên:** `POST http://localhost:3000/api/students`
-* **Headers:** `Content-Type: application/json`
-* **Body (JSON):**
-```json
-{
-  "mssv": "SV001",
-  "hoTen": "Nguyen Van A",
-  "email": "nva@example.com",
-  "soDienThoai": "0901234567"
-}
+Tất cả các truy vấn đều thực hiện qua **API Gateway (Port 3000)**. Bạn có thể mở trình duyệt web hoặc dùng cURL/Postman để kiểm tra danh mục và trạng thái trực tuyến của toàn bộ Microservices:
+
+* **Xem Service Catalog & Trạng thái hoạt động:** `GET http://localhost:3000/`
+  > *Trả về thông tin hệ thống, danh sách các endpoint khả dụng và trạng thái `ONLINE` / `OFFLINE` của từng dịch vụ con.*
+
+* **Kiểm tra danh sách dữ liệu các dịch vụ:**
+  * **Sinh viên:** `GET http://localhost:3000/api/students`
+  * **Đề tài:** `GET http://localhost:3000/api/topics`
+  * **Đăng ký:** `GET http://localhost:3000/api/registrations`
+
+---
+
+### 2. Kiểm tra tự động bằng Postman (Automated Test Suite)
+
+Dự án đi kèm bộ kịch bản kiểm thử tự động gồm **21 bước liên hoàn** (`Thesis_SOA_Postman_3.json`) giúp khởi tạo dữ liệu ngẫu nhiên, tự động lưu biến (`current_mssv`, `current_maDeTai`, `current_maDangKy`), kiểm tra tính toàn vẹn và đối soát dữ liệu cuối cùng[cite: 16].
+
+#### Các bước thực hiện:
+
+1. **Import File Collection vào Postman:**
+   * Mở ứng dụng **Postman** -> Chọn **Import** (ở góc trên bên trái).
+   * Kéo thả file `Thesis_SOA_Postman_3.json` hoặc dán mã JSON của bộ Test Suite[cite: 16].
+
+2. **Khởi chạy Collection Runner:**
+   * Nhấp chuột phải vào Collection **`Thesis SOA Automated Test Suite (21 Steps)`** vừa import[cite: 16].
+   * Chọn **Run collection**[cite: 16].
+
+3. **Cấu hình tham số chạy:**
+   * **Iterations:** `1`
+   * **Delay:** `500 ms` hoặc `1000 ms` (giúp quan sát tiến trình rõ hơn)
+   * **Môi trường / Biến:** Đảm bảo `base_url` được đặt giá trị `http://localhost:3000`[cite: 16].
+   * **Tùy chọn lưu trữ (Trải nghiệm xem kết quả):** Tích chọn ô **`Persist responses for a session`** để xem lại dữ liệu JSON trả về của từng request sau khi chạy xong.
+
+4. **Thực thi Kịch bản:**
+   * Nhấn nút cam **Run Thesis SOA Automated Test Suite**[cite: 16].
+   * Màn hình sẽ tự động thực thi tuần tự từ **Bước 01 đến Bước 21** (Tạo sinh viên/đề tài -> Cập nhật thông tin -> Tạo phiếu đăng ký -> Xóa cascade & kiểm tra đối soát CSDL)[cite: 16].
 ```
 
 ---
 
 ## 📁 Cấu trúc Dự án
 
-```text
 thesis-soa-demo/
 ├── api-gateway/            # API Gateway (Điểm truy cập tập trung Cổng 3000)
-│   ├── config/             # Registry lưu danh mục các dịch vụ nội bộ (Ẩn port)
-│   ├── routes/             # Cấu hình proxy và định tuyến URL
-│   └── server.js           # Khởi chạy ứng dụng Gateway
+│   ├── config/             # Registry lưu danh mục dịch vụ (serviceRegistry.js)
+│   ├── routes/             # Dynamic Route Proxy & Service Catalog
+│   ├── errorHandler.js     # Middleware xử lý lỗi Gateway
+│   └── server.js           # Khởi chạy Gateway & Health Check
 ├── student-service/        # Dịch vụ Quản lý Sinh viên (Port 3001)
-│   ├── routes/
-│   ├── controllers/
-│   ├── services/
-│   ├── models/             # Kết nối & Thao tác SQLite
-│   └── server.js
+│   ├── config/             # Cấu hình kết nối CSDL SQLite
+│   ├── controllers/        # Xử lý Request/Response cho Sinh viên
+│   ├── interfaces/         # Khai báo cấu trúc dữ liệu / DTO Sinh viên
+│   ├── models/             # Thao tác CSDL Sinh viên (better-sqlite3)
+│   ├── routes/             # Định tuyến API Sinh viên
+│   ├── services/           # Logic nghiệp vụ Quản lý Sinh viên
+│   ├── types/              # Định nghĩa Type / Enum Sinh viên
+│   ├── errorHandler.js     # Middleware xử lý lỗi Student Service
+│   └── server.js           # Khởi chạy Student Service
 ├── topic-service/          # Dịch vụ Quản lý Đề tài (Port 3002)
-│   └── ...
-├── registration-service/   # Dịch vụ Đăng ký Đề tài (Port 3003)
-│   └── ...
-├── .gitignore              # Loại bỏ node_modules và các file *.db
-├── package.json            # Cấu hình scripts và dependencies dùng chung
-└── README.md               # Tài liệu hướng dẫn dự án
+│   ├── config/             # Cấu hình CSDL
+│   ├── controllers/        # Controller Quản lý Đề tài
+│   ├── interfaces/         # Khai báo cấu trúc dữ liệu / DTO Đề tài
+│   ├── models/             # Thao tác CSDL Đề tài
+│   ├── routes/             # Định tuyến API Đề tài
+│   ├── services/           # Logic nghiệp vụ Đề tài
+│   ├── types/              # Định nghĩa Type / Enum Đề tài
+│   ├── errorHandler.js     # Middleware xử lý lỗi Topic Service
+│   └── server.js           # Khởi chạy Topic Service
+├── registration-service/   # Dịch vụ Quản lý Đăng ký & Đồng bộ (Port 3003)
+│   ├── config/             # Cấu hình CSDL & Client gọi API ngoài
+│   ├── controllers/        # Controller Đăng ký & Đồng bộ
+│   ├── interfaces/         # Khai báo cấu trúc dữ liệu / DTO Đăng ký
+│   ├── models/             # Thao tác CSDL Đăng ký
+│   ├── routes/             # Route Đăng ký, Sync Data & Cascade Delete
+│   ├── services/           # Logic nghiệp vụ Đăng ký & Call API liên dịch vụ
+│   ├── types/              # Định nghĩa Type / Enum Đăng ký
+│   ├── errorHandler.js     # Middleware xử lý lỗi Registration Service
+│   └── server.js           # Khởi chạy Registration Service
+├── .gitignore              # Loại bỏ node_modules và các file CSDL *.db
+├── package.json            # Cấu hình scripts (concurrently) và dependencies dùng chung
+├── README.md               # Tài liệu hướng dẫn dự án
+├── testsuit postman.txt    # File văn bản mô tả 21 bước Test Suite
+└── Thesis_SOA_Postman.json # Collection Postman tự động kiểm thử 21 bước
 ```
