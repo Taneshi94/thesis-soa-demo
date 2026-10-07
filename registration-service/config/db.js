@@ -15,8 +15,7 @@ db.exec(`
     tenSinhVien TEXT NOT NULL,
     maDeTai TEXT NOT NULL,
     tenDeTai TEXT NOT NULL,
-    ngayDangKy TEXT NOT NULL,
-    trangThai TEXT NOT NULL
+    ngayDangKy TEXT NOT NULL
   );
 `);
 
@@ -27,8 +26,8 @@ const count = /** @type {{ count: number } | undefined} */ (
 
 if (count && count.count === 0) {
   const insertStmt = db.prepare(`
-    INSERT INTO DANGKY (maDangKy, mssv, tenSinhVien, maDeTai, tenDeTai, ngayDangKy, trangThai)
-    VALUES (@maDangKy, @mssv, @tenSinhVien, @maDeTai, @tenDeTai, @ngayDangKy, @trangThai)
+    INSERT INTO DANGKY (maDangKy, mssv, tenSinhVien, maDeTai, tenDeTai, ngayDangKy)
+    VALUES (@maDangKy, @mssv, @tenSinhVien, @maDeTai, @tenDeTai, @ngayDangKy)
   `);
 
   const seedTransaction = db.transaction((items) => {
@@ -44,8 +43,7 @@ if (count && count.count === 0) {
       tenSinhVien: 'Nguyễn Văn A',
       maDeTai: 'DT001',
       tenDeTai: 'Xây dựng hệ thống Microservices với Express.js',
-      ngayDangKy: '2026-10-01',
-      trangThai: 'APPROVED'
+      ngayDangKy: '2026-10-01'
     }
   ]);
 }

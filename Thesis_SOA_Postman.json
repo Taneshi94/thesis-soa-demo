@@ -1,413 +1,778 @@
 {
-	"info": {
-		"name": "Thesis SOA API Gateway (Port 3000)",
-		"description": "Bộ test API cho hệ thống Microservices đi qua API Gateway.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "1. API Gateway",
-			"item": [
-				{
-					"name": "GET Service Catalog & Health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "2. Student Service",
-			"item": [
-				{
-					"name": "GET All Students",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/students",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"students"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST Create Student",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"mssv\": \"SV001\",\n  \"hoTen\": \"Đinh Duy Thái\",\n  \"email\": \"thaidinh@example.com\",\n  \"soDienThoai\": \"0901234567\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/students",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"students"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Student by MSSV",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/students/SV001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"students",
-								"SV001"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PUT Update Student",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"hoTen\": \"Đinh Duy Thái (Cập nhật)\",\n  \"email\": \"thaidinh_updated@example.com\",\n  \"soDienThoai\": \"0988888888\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/students/SV001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"students",
-								"SV001"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE Student",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/students/SV001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"students",
-								"SV001"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "3. Topic Service",
-			"item": [
-				{
-					"name": "GET All Topics",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/topics",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST Create Topic",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"maDeTai\": \"DT001\",\n  \"tenDeTai\": \"Nghiên cứu Kiến trúc Microservices\",\n  \"moTa\": \"Xây dựng hệ thống SOA dùng Express.js\",\n  \"giangVienHuongDan\": \"TS. Nguyễn Văn A\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/topics",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Topic by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/topics/DT001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics",
-								"DT001"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PUT Update Topic",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"tenDeTai\": \"Nghiên cứu Kiến trúc Microservices và API Gateway\",\n  \"moTa\": \"Mở rộng hệ thống kết hợp GraphQL\",\n  \"giangVienHuongDan\": \"TS. Nguyễn Văn A\",\n  \"trangThai\": \"Đang thực hiện\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/topics/DT001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics",
-								"DT001"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PATCH Update Topic Status",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"trangThai\": \"Đã hoàn thành\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/topics/DT001/status",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics",
-								"DT001",
-								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE Topic",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/topics/DT001",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"topics",
-								"DT001"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "4. Registration Service",
-			"item": [
-				{
-					"name": "GET All Registrations",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/registrations",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"registrations"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST Create Registration",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"mssv\": \"SV001\",\n  \"maDeTai\": \"DT001\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/registrations",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"registrations"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Registration by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/registrations/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"registrations",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE Registration",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/registrations/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"registrations",
-								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:3000",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "f0a05789-eba7-4d7c-b477-85986487d09b",
+    "name": "Thesis SOA Automated Test Suite (21 Steps)",
+    "description": "Bộ Test Suite tự động chạy 21 kịch bản tích hợp và đối soát dữ liệu qua API Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58509369"
+  },
+  "item": [
+    {
+      "name": "01. POST Create Student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var res = pm.response.json();",
+              "var reqBody = JSON.parse(pm.request.body.raw);",
+              "var mssv = (res.data && res.data.mssv) ? res.data.mssv : reqBody.mssv;",
+              "pm.collectionVariables.set('current_mssv', mssv);",
+              "console.log('Saved current_mssv:', mssv);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mssv\": \"SV{{$randomInt}}\",\n  \"hoTen\": \"{{$randomFullName}}\",\n  \"lop\": \"CNTT-K46\",\n  \"email\": \"student_{{$timestamp}}@gmail.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/students",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02. GET All Students",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/students",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03. GET Student by MSSV",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/students/{{current_mssv}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students",
+            "{{current_mssv}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04. POST Create Topic",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var res = pm.response.json();",
+              "var reqBody = JSON.parse(pm.request.body.raw);",
+              "var maDeTai = (res.data && res.data.maDeTai) ? res.data.maDeTai : reqBody.maDeTai;",
+              "pm.collectionVariables.set('current_maDeTai', maDeTai);",
+              "console.log('Saved current_maDeTai:', maDeTai);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"maDeTai\": \"DT{{$randomInt}}\",\n  \"tenDeTai\": \"Nghiên cứu {{$randomCatchPhrase}}\",\n  \"moTa\": \"Mô tả đề tài {{$randomWord}}\",\n  \"giangVienHuongDan\": \"TS. {{$randomFullName}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/topics",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05. GET All Topics",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/topics",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06. GET Topic by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/topics/{{current_maDeTai}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics",
+            "{{current_maDeTai}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07. PUT Update Student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hoTen\": \"{{$randomFullName}}\",\n  \"lop\": \"CNTT-K46-Update\",\n  \"email\": \"updated_{{$timestamp}}@gmail.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/students/{{current_mssv}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students",
+            "{{current_mssv}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08. PUT Update Topic",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenDeTai\": \"Đề tài đã cập nhật\",\n  \"moTa\": \"Mô tả mới\",\n  \"giangVienHuongDan\": \"GS. Nguyen Van A\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/topics/{{current_maDeTai}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics",
+            "{{current_maDeTai}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09. POST Create Registration (SV002 + Current Topic)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var res = pm.response.json();",
+              "var maDangKy = res.data ? (res.data.maDangKy || res.data.id) : (res.maDangKy || res.id);",
+              "pm.collectionVariables.set('current_maDangKy', maDangKy);",
+              "console.log('Saved current_maDangKy:', maDangKy);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mssv\": \"SV002\",\n  \"maDeTai\": \"{{current_maDeTai}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/registrations",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. PUT Update Registration (DK001 -> DT002)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"maDeTai\": \"DT002\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/registrations/DK001",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations",
+            "DK001"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. GET Registration by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/registrations/{{current_maDangKy}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations",
+            "{{current_maDangKy}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12. PUT Update Registration (DK001 -> Current MSSV)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mssv\": \"{{current_mssv}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/registrations/DK001",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations",
+            "DK001"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13. PUT Update Student (Second Update)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hoTen\": \"Đinh Duy Thái\",\n  \"email\": \"thai@gmail.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/students/{{current_mssv}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students",
+            "{{current_mssv}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14. PUT Update Topic (Second Update)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenDeTai\": \"Đề tài cập nhật lần 2\",\n  \"moTa\": \"Mô tả cập nhật lần 2\",\n  \"giangVienHuongDan\": \"TS. Tran Van B\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/topics/{{current_maDeTai}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics",
+            "{{current_maDeTai}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15. GET All Registrations",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/registrations",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16. POST Create Registration (SV001 + DT001)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var res = pm.response.json();",
+              "var maDangKy = res.data ? (res.data.maDangKy || res.data.id) : (res.maDangKy || res.id);",
+              "pm.collectionVariables.set('current_maDangKy', maDangKy);",
+              "console.log('Saved current_maDangKy:', maDangKy);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mssv\": \"SV001\",\n  \"maDeTai\": \"DT001\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/registrations",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17. DELETE Registration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/registrations/{{current_maDangKy}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations",
+            "{{current_maDangKy}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18. DELETE Topic",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/topics/{{current_maDeTai}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics",
+            "{{current_maDeTai}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19. DELETE Student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/students/{{current_mssv}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "students",
+            "{{current_mssv}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "20. GET All Registrations (Final Check)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/registrations",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "registrations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "21. GET All Topics (Final Check)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/topics",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "topics"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "current_mssv",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "current_maDeTai",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "current_maDangKy",
+      "value": "",
+      "type": "string"
+    }
+  ]
 }

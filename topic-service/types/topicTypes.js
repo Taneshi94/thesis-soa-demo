@@ -5,7 +5,7 @@
  * @property {string} tenDeTai
  * @property {string} [moTa]
  * @property {string} giangVienHuongDan
- * @property {'ConMo' | 'DaDangKy' | 'Dong'} trangThai
+ * @property {0 | 1 | 2} trangThai - Trạng thái dạng số từ CSDL (0: Mở, 1: Đã đăng ký, 2: Đã đóng)
  */
 
 /**
@@ -15,7 +15,6 @@
  * @property {string} tenDeTai
  * @property {string} [moTa]
  * @property {string} giangVienHuongDan
- * @property {'ConMo' | 'DaDangKy' | 'Dong'} trangThai
  */
 
 /**
@@ -24,13 +23,12 @@
  * @property {string} [tenDeTai]
  * @property {string} [moTa]
  * @property {string} [giangVienHuongDan]
- * @property {'ConMo' | 'DaDangKy' | 'Dong'} [trangThai]
  */
 
 /**
  * Payload khi chỉ cập nhật riêng trạng thái đề tài (Request Body)
  * @typedef {Object} UpdateTopicStatusDTO
- * @property {'ConMo' | 'DaDangKy' | 'Dong'} trangThai
+ * @property {0 | 1 | 2 | string | number} trangThai - Chấp nhận số hoặc chuỗi từ JSON request body
  */
 
 module.exports = {};

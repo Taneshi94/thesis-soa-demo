@@ -3,6 +3,8 @@ node_modules/
 */node_modules/
 
 # Loại bỏ các file dữ liệu SQLite
+*.db-wal
+*.db-shm
 *.db
 *.sqlite
 

@@ -42,9 +42,18 @@ router.use('/api/:serviceName', (req, res, next) => {
     });
   }
 
-  // Chuyển tiếp Request và giữ nguyên exact URL gốc (tránh bị đẻ thêm dấu / ở cuối)
+  // Chuyển tiếp Request và giữ nguyên exact URL gốc
   return proxy(targetService.target, {
-    proxyReqPathResolver: (req) => req.originalUrl
+    proxyReqPathResolver: (req) => req.originalUrl,
+    
+    // Bổ sung xử lý lỗi kết nối khi Microservice rớt đột ngột
+    proxyErrorHandler: (err, res, next) => {
+      console.error(`[Proxy Error - ${targetService.name}]:`, err.message);
+      return res.status(502).json({
+        success: false,
+        message: `Lỗi kết nối tới dịch vụ '${targetService.name}' (Bad Gateway).`
+      });
+    }
   })(req, res, next);
 });
 

@@ -1,3 +1,4 @@
+const AppError = require('../errorHandler').AppError;
 /**
  * Interface định nghĩa các phương thức nghiệp vụ (Business Logic) cho Sinh viên
  */
@@ -5,46 +6,55 @@ class IStudentService {
   /**
    * Lấy danh sách toàn bộ sinh viên
    * @returns {import('../types/studentTypes').StudentEntity[]}
+   * @throws {AppError} Nếu có lỗi xảy ra trong quá trình lấy dữ liệu
    */
   static getAllStudents() {
-    throw new Error("Phương thức 'getAllStudents()' chưa được triển khai!");
+    throw new AppError('Phương thức getAllStudents() chưa được triển khai!', 501);
   }
 
   /**
-   * Lấy thông tin sinh viên theo MSSV
+   * 2. Lấy thông tin sinh viên theo MSSV
    * @param {string} mssv
-   * @returns {import('../types/studentTypes').StudentEntity | undefined}
+   * @returns {import('../types/studentTypes').StudentEntity}
+   * @throws {AppError} 404 - Khi không tìm thấy sinh viên
+   * @throws {AppError} 501 - Nếu chưa được triển khai
    */
   static getStudentByMssv(mssv) {
-    throw new Error("Phương thức 'getStudentByMssv()' chưa được triển khai!");
+    throw new AppError('Phương thức getStudentByMssv() chưa được triển khai!', 501);
   }
 
   /**
-   * Tạo mới sinh viên
+   * 3. Tạo sinh viên mới
    * @param {import('../types/studentTypes').CreateStudentDTO} dto
    * @returns {import('../types/studentTypes').StudentEntity}
+   * @throws {AppError} 409 - Khi MSSV đã tồn tại
+   * @throws {AppError} 501 - Nếu chưa được triển khai
    */
   static createStudent(dto) {
-    throw new Error("Phương thức 'createStudent()' chưa được triển khai!");
+    throw new AppError('Phương thức createStudent() chưa được triển khai!', 501);
   }
 
   /**
-   * Cập nhật thông tin sinh viên
+   * 4. Cập nhật thông tin sinh viên (Bất đồng bộ - gọi API Gateway đồng bộ)
    * @param {string} mssv
    * @param {import('../types/studentTypes').UpdateStudentDTO} dto
    * @returns {Promise<import('../types/studentTypes').StudentEntity>}
+   * @throws {AppError} 404 - Khi không tìm thấy sinh viên
+   * @throws {AppError} 501 - Nếu chưa được triển khai
    */
-  static updateStudent(mssv, dto) {
-    throw new Error("Phương thức 'updateStudent()' chưa được triển khai!");
+  static async updateStudent(mssv, dto) {
+    throw new AppError('Phương thức updateStudent() chưa được triển khai!', 501);
   }
 
   /**
-   * Xóa sinh viên theo MSSV
+   * 5. Xóa sinh viên theo MSSV (Bất đồng bộ - gọi API Gateway đồng bộ)
    * @param {string} mssv
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
+   * @throws {AppError} 404 - Khi không tìm thấy sinh viên
+   * @throws {AppError} 501 - Nếu chưa được triển khai
    */
-  static deleteStudent(mssv) {
-    throw new Error("Phương thức 'deleteStudent()' chưa được triển khai!");
+  static async deleteStudent(mssv) {
+    throw new AppError('Phương thức deleteStudent() chưa được triển khai!', 501);
   }
 }
 

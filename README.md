@@ -1,4 +1,3 @@
-```markdown
 # Thesis SOA Demo - Express.js Microservices Architecture
 
 Hệ thống demo kiến trúc Hướng dịch vụ (SOA / Microservices) được xây dựng bằng **Node.js** và **Express.js**. Dự án áp dụng mô hình kiến trúc 3 lớp (Model - Service - Controller), tích hợp **API Gateway** làm điểm truy cập tập trung và lưu trữ dữ liệu bằng **SQLite**.
@@ -22,10 +21,11 @@ Tất cả các truy vấn từ ứng dụng client (Frontend / Mobile / Postman
 │ Student Svc   │   │  Topic Svc    │    │  Registration Svc   │
 │ (Internal)    │   │  (Internal)   │    │  (Internal)         │
 └───────────────┘   └───────────────┘    └─────────────────────┘
-
 ```
 
-> **Lưu ý về Bảo mật:** Các cổng của Service con (3001, 3002, 3003) được ẩn hoàn toàn khỏi Client. Mọi tương tác bắt buộc phải thông qua API Gateway tại cổng 3000.
+> **Lưu ý về Bảo mật:** 
+> - Các cổng của Service con (3001, 3002, 3003) được ẩn hoàn toàn khỏi Client và quản lý thông qua biến môi trường (`STUDENT_SERVICE_URL`, `TOPIC_SERVICE_URL`, `REGISTRATION_SERVICE_URL`).
+> - Mọi tương tác của Client bắt buộc phải thông qua API Gateway tại cổng 3000.
 
 ---
 
@@ -41,10 +41,10 @@ Tất cả các truy vấn từ ứng dụng client (Frontend / Mobile / Postman
 
 | Thư viện | Phiên bản khuyến nghị | Phạm vi sử dụng | Mục đích |
 | --- | --- | --- | --- |
-| `express` | `^4.18.0` | Tất cả 4 Services | Web framework xây dựng RESTful API |
+| `express` | `^5.2.1` | Tất cả 4 Services | Web framework xây dựng RESTful API |
 | `cors` | `^2.8.5` | Tất cả 4 Services | Cho phép truy cập Cross-Origin Resource Sharing |
-| `express-http-proxy` | `^2.0.0` | `api-gateway` | Middleware chuyển tiếp (Proxy) request từ Gateway sang Service con |
 | `sqlite3` | `^5.1.0` | Các Service con | Driver kết nối và thao tác với CSDL SQLite |
+| `express-http-proxy` | `^2.1.1` | API Gateway | Chuyển tiếp truy vấn từ Gateway tới các Microservices |
 | `concurrently` | `^8.0.0` | Root Project | Chạy đồng thời cả 4 dịch vụ bằng 1 lệnh duy nhất |
 
 ---
@@ -56,7 +56,6 @@ Tất cả các truy vấn từ ứng dụng client (Frontend / Mobile / Postman
 ```bash
 git clone [https://github.com/](https://github.com/)<your-username>/thesis-soa-demo.git
 cd thesis-soa-demo
-
 ```
 
 ### 2. Cài đặt Thư viện (Dependencies)
@@ -64,9 +63,7 @@ cd thesis-soa-demo
 * **Trường hợp 1: Cài đặt tập trung tại thư mục gốc**
 ```bash
 npm install express cors sqlite3 express-http-proxy concurrently
-
 ```
-
 
 * **Trường hợp 2: Quản lý riêng cho từng Service**
 ```bash
@@ -84,10 +81,7 @@ cd topic-service && npm install express cors sqlite3 && cd ..
 
 # Cài đặt cho Registration Service
 cd registration-service && npm install express cors sqlite3 && cd ..
-
 ```
-
-
 
 ### 3. Khởi tạo Cơ sở dữ liệu (Database Setup)
 
@@ -101,7 +95,6 @@ Chạy lệnh duy nhất sau tại thư mục gốc để kích hoạt đồng t
 
 ```bash
 npm run dev
-
 ```
 
 Màn hình Terminal thông báo hệ thống đã sẵn sàng:
@@ -111,7 +104,6 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 [0] Student Service running on port 3001
 [1] Topic Service running on port 3002
 [2] Registration Service running on port 3003
-
 ```
 
 ---
@@ -122,7 +114,7 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 
 | Phương thức | Endpoint Gateway | Mô tả |
 | --- | --- | --- |
-| `GET` | `/` | Trả về Service Catalog & trạng thái trực tuyến của các dịch vụ |
+| `GET` | `/` | Trả về Service Catalog & trạng thái trực tuyến của các dịch vụ (chỉ lộ cổng Gateway) |
 
 ### 2. Quản lý Sinh viên (`/api/students`)
 
@@ -145,14 +137,19 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 | `PATCH` | `/api/topics/:maDeTai/status` | Cập nhật trạng thái đề tài |
 | `DELETE` | `/api/topics/:maDeTai` | Xóa đề tài |
 
-### 4. Quản lý Đăng ký (`/api/registrations`)
+### 4. Quản lý Đăng ký & Đồng bộ (`/api/registrations`)
 
 | Phương thức | Endpoint | Mô tả |
 | --- | --- | --- |
 | `GET` | `/api/registrations` | Lấy danh sách tất cả phiếu đăng ký |
-| `GET` | `/api/registrations/:id` | Lấy chi tiết phiếu đăng ký theo ID |
+| `GET` | `/api/registrations/:maDangKy` | Lấy chi tiết phiếu đăng ký theo mã |
 | `POST` | `/api/registrations` | Tạo mới phiếu đăng ký đề tài |
-| `DELETE` | `/api/registrations/:id` | Hủy/Xóa phiếu đăng ký |
+| `PUT` | `/api/registrations/:maDangKy` | Cập nhật phiếu đăng ký |
+| `DELETE` | `/api/registrations/:maDangKy` | Hủy/Xóa phiếu đăng ký theo mã |
+| `PATCH` | `/api/registrations/sync-student/:mssv` | *(Nội bộ)* Đồng bộ tên sinh viên |
+| `PATCH` | `/api/registrations/sync-topic/:maDeTai` | *(Nội bộ)* Đồng bộ tên đề tài |
+| `DELETE` | `/api/registrations/by-student/:mssv` | *(Nội bộ)* Xóa phiếu đăng ký theo sinh viên |
+| `DELETE` | `/api/registrations/by-topic/:maDeTai` | *(Nội bộ)* Xóa phiếu đăng ký theo đề tài |
 
 ---
 
@@ -164,8 +161,7 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 * Lấy danh sách đề tài: `http://localhost:3000/api/topics`
 * Lấy danh sách đăng ký: `http://localhost:3000/api/registrations`
 
-
-2. **Thunder Client / Postman (Phương thức POST / PUT / DELETE):**
+2. **Thunder Client / Postman (Phương thức POST / PUT / PATCH / DELETE):**
 * **Thêm mới sinh viên:** `POST http://localhost:3000/api/students`
 * **Headers:** `Content-Type: application/json`
 * **Body (JSON):**
@@ -176,12 +172,7 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
   "email": "nva@example.com",
   "soDienThoai": "0901234567"
 }
-
 ```
-
-
-
-
 
 ---
 
@@ -190,7 +181,7 @@ Màn hình Terminal thông báo hệ thống đã sẵn sàng:
 ```text
 thesis-soa-demo/
 ├── api-gateway/            # API Gateway (Điểm truy cập tập trung Cổng 3000)
-│   ├── config/             # Registry lưu danh mục các dịch vụ nội bộ
+│   ├── config/             # Registry lưu danh mục các dịch vụ nội bộ (Ẩn port)
 │   ├── routes/             # Cấu hình proxy và định tuyến URL
 │   └── server.js           # Khởi chạy ứng dụng Gateway
 ├── student-service/        # Dịch vụ Quản lý Sinh viên (Port 3001)
@@ -206,9 +197,4 @@ thesis-soa-demo/
 ├── .gitignore              # Loại bỏ node_modules và các file *.db
 ├── package.json            # Cấu hình scripts và dependencies dùng chung
 └── README.md               # Tài liệu hướng dẫn dự án
-
-```
-
-```
-
 ```

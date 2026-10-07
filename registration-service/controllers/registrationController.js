@@ -1,100 +1,119 @@
 const RegistrationService = require('../services/registrationService');
+const { AppError } = require('../errorHandler');
 
 class RegistrationController {
-  /**
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  static getAll(req, res) {
+  // 1. Lấy danh sách tất cả phiếu đăng ký
+  static getAll(req, res, next) {
     try {
       const registrations = RegistrationService.getAllRegistrations();
       return res.status(200).json({ success: true, data: registrations });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi hệ thống khi lấy danh sách đăng ký';
-      return res.status(500).json({ success: false, message });
+      next(error);
     }
   }
 
-  /**
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  static getByMaDangKy(req, res) {
+  // 2. Lấy thông tin chi tiết phiếu đăng ký theo mã
+  static getByMaDangKy(req, res, next) {
     try {
-      const maDangKy = String(req.params.maDangKy); // Khắc phục ts(2345)
+      const maDangKy = String(req.params.maDangKy);
       const registration = RegistrationService.getByMaDangKy(maDangKy);
       return res.status(200).json({ success: true, data: registration });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Không tìm thấy phiếu đăng ký';
-      return res.status(404).json({ success: false, message });
+      next(error);
     }
   }
 
-  /**
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  static create(req, res) {
+  // 3. Tạo phiếu đăng ký mới
+  static async create(req, res, next) {
     try {
-      const newRegistration = RegistrationService.registerTopic(req.body);
+      const newRegistration = await RegistrationService.registerTopic(req.body);
       return res.status(201).json({ success: true, data: newRegistration });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi tạo đăng ký';
-      return res.status(400).json({ success: false, message });
+      next(error);
     }
   }
 
-  /**
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  static update(req, res) {
+  // 4. Cập nhật phiếu đăng ký
+  static async update(req, res, next) {
     try {
-      const maDangKy = String(req.params.maDangKy); // Khắc phục ts(2345)
-      const updated = RegistrationService.updateRegistration(maDangKy, req.body);
+      const maDangKy = String(req.params.maDangKy);
+      const updated = await RegistrationService.updateRegistration(maDangKy, req.body);
       return res.status(200).json({ success: true, data: updated });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi cập nhật đăng ký';
-      return res.status(400).json({ success: false, message });
+      next(error);
     }
   }
 
-  static async syncStudent(req, res) {
+  // 5. Đồng bộ thông tin sinh viên từ Student Service
+  static async syncStudent(req, res, next) {
     try {
       const mssv = String(req.params.mssv);
       const { tenSinhVien } = req.body;
-      RegistrationService.syncStudentInfo(mssv, tenSinhVien);
+
+      if (!tenSinhVien) {
+        throw new AppError('Tên sinh viên không được để trống khi đồng bộ', 400);
+      }
+
+      await RegistrationService.syncStudentInfo(mssv, tenSinhVien);
       return res.status(200).json({ success: true, message: 'Đã đồng bộ thông tin sinh viên' });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi đồng bộ thông tin sinh viên';
-      return res.status(500).json({ success: false, message: message });
+      next(error);
     }
   }
 
-  static async syncTopic(req, res) {
+  // 6. Đồng bộ thông tin đề tài từ Topic Service
+  static async syncTopic(req, res, next) {
     try {
       const maDeTai = String(req.params.maDeTai);
       const { tenDeTai } = req.body;
-      RegistrationService.syncTopicInfo(maDeTai, tenDeTai);
+
+      if (!tenDeTai) {
+        throw new AppError('Tên đề tài không được để trống khi đồng bộ', 400);
+      }
+
+      await RegistrationService.syncTopicInfo(maDeTai, tenDeTai);
       return res.status(200).json({ success: true, message: 'Đã đồng bộ thông tin đề tài' });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi đồng bộ thông tin đề tài';
-      return res.status(500).json({ success: false, message: message });
+      next(error);
     }
   }
 
-  /**
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  static delete(req, res) {
+  // 7. Xóa phiếu đăng ký
+  static async delete(req, res, next) {
     try {
-      const maDangKy = String(req.params.maDangKy); // Khắc phục ts(2345)
-      RegistrationService.deleteRegistration(maDangKy);
+      const maDangKy = String(req.params.maDangKy);
+      await RegistrationService.deleteRegistration(maDangKy);
       return res.status(200).json({ success: true, message: `Đã xóa đăng ký ${maDangKy}` });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi xóa đăng ký';
-      return res.status(400).json({ success: false, message });
+      next(error);
+    }
+  }
+
+  // 8. Xóa tất cả phiếu đăng ký của một sinh viên
+  static async syncDeleteByStudent(req, res, next) {
+    try {
+      const mssv = String(req.params.mssv);
+      await RegistrationService.deleteByMssv(mssv);
+      return res.status(200).json({
+        success: true,
+        message: `Đã xóa các phiếu đăng ký của sinh viên ${mssv}`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 9. Xóa tất cả phiếu đăng ký liên quan đến một đề tài
+  static async syncDeleteByTopic(req, res, next) {
+    try {
+      const maDeTai = String(req.params.maDeTai);
+      await RegistrationService.deleteByMaDeTai(maDeTai);
+      return res.status(200).json({
+        success: true,
+        message: `Đã xóa các phiếu đăng ký liên quan đến đề tài ${maDeTai}`
+      });
+    } catch (error) {
+      next(error);
     }
   }
 }

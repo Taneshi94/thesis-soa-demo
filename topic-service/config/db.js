@@ -17,7 +17,7 @@ db.exec(`
     tenDeTai TEXT NOT NULL,
     moTa TEXT,
     giangVienHuongDan TEXT NOT NULL,
-    trangThai TEXT NOT NULL CHECK(trangThai IN ('ConMo', 'DaDangKy', 'Dong'))
+    trangThai INT NOT NULL CHECK(trangThai IN (0, 1, 2))
   );
 `);
 
@@ -44,14 +44,14 @@ if (count && count.count === 0) {
       tenDeTai: 'Xây dựng hệ thống Đồ án Tốt nghiệp theo SOA',
       moTa: 'Phân tích và triển khai kiến trúc SOA/Microservices với Express.js',
       giangVienHuongDan: 'TS. Nguyễn Văn C',
-      trangThai: 'ConMo'
+      trangThai: 0
     },
     {
       maDeTai: 'DT002',
       tenDeTai: 'Nghiên cứu ứng dụng Microservices với Node.js',
       moTa: 'Tìm hiểu cơ chế điều hướng API Gateway và liên tiếp dữ liệu giữa các dịch vụ',
       giangVienHuongDan: 'ThS. Lê Thị D',
-      trangThai: 'ConMo'
+      trangThai: 0
     }
   ]);
 }

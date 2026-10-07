@@ -7,7 +7,6 @@
  * @property {string} maDeTai
  * @property {string} tenDeTai
  * @property {string} ngayDangKy
- * @property {'ThanhCong' | 'Huy'} trangThai
  */
 
 /**
@@ -17,8 +16,10 @@
  * @property {string} maDeTai
  */
 
-/** * Payload khi sinh viên gửi yêu cầu cập nhật đăng ký (Request Body)
+/**
+ * Payload khi cập nhật thông tin đăng ký (Request Body)
  * @typedef {Object} UpdateRegistrationDTO
- * @property {'ThanhCong' | 'Huy'} trangThai
+ * @property {string} [tenSinhVien]
+ * @property {string} [tenDeTai]
  */
 module.exports = {};

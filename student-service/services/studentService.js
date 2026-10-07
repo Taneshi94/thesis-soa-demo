@@ -1,7 +1,7 @@
 const IStudentService = require('../interfaces/IStudentService');
 const StudentModel = require('../models/studentModel');
+const { AppError } = require('../errorHandler');
 
-// Port của API Gateway
 const GATEWAY_URL = 'http://localhost:3000';
 
 /**
@@ -9,6 +9,7 @@ const GATEWAY_URL = 'http://localhost:3000';
  */
 class StudentService extends IStudentService {
   /**
+   * 1. Lấy tất cả sinh viên
    * @returns {import('../types/studentTypes').StudentEntity[]}
    */
   static getAllStudents() {
@@ -16,37 +17,40 @@ class StudentService extends IStudentService {
   }
 
   /**
+   * 2. Lấy thông tin sinh viên theo MSSV
    * @param {string} mssv
    * @returns {import('../types/studentTypes').StudentEntity}
    */
   static getStudentByMssv(mssv) {
     const student = StudentModel.findByMssv(mssv);
     if (!student) {
-      throw new Error(`Không tìm thấy sinh viên với MSSV: ${mssv}`);
+      throw new AppError(`Không tìm thấy sinh viên với MSSV: ${mssv}`, 404);
     }
     return student;
   }
 
   /**
+   * 3. Tạo sinh viên mới
    * @param {import('../types/studentTypes').CreateStudentDTO} dto
    * @returns {import('../types/studentTypes').StudentEntity}
    */
   static createStudent(dto) {
     const existing = StudentModel.findByMssv(dto.mssv);
     if (existing) {
-      throw new Error(`Sinh viên với MSSV ${dto.mssv} đã tồn tại!`);
+      throw new AppError(`Sinh viên với MSSV ${dto.mssv} đã tồn tại!`, 409);
     }
 
     StudentModel.create(dto);
     
     const created = StudentModel.findByMssv(dto.mssv);
     if (!created) {
-      throw new Error('Lỗi trong quá trình tạo sinh viên');
+      throw new AppError('Lỗi trong quá trình tạo sinh viên', 500);
     }
     return created;
   }
 
   /**
+   * 4. Cập nhật thông tin sinh viên
    * @param {string} mssv
    * @param {import('../types/studentTypes').UpdateStudentDTO} dto
    * @returns {Promise<import('../types/studentTypes').StudentEntity>}
@@ -58,10 +62,8 @@ class StudentService extends IStudentService {
 
     const updated = StudentModel.findByMssv(mssv);
     if (!updated) {
-      throw new Error('Lỗi trong quá trình cập nhật sinh viên');
+      throw new AppError('Lỗi trong quá trình cập nhật sinh viên', 500);
     }
-
-    // Tự động đồng bộ tên sinh viên sang Registration Service qua API Gateway nếu họ tên bị thay đổi
     if (dto.hoTen && dto.hoTen !== existing.hoTen) {
       try {
         await fetch(`${GATEWAY_URL}/api/registrations/sync-student/${mssv}`, {
@@ -79,12 +81,25 @@ class StudentService extends IStudentService {
   }
 
   /**
+   * 5. Xóa sinh viên theo MSSV
    * @param {string} mssv
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  static deleteStudent(mssv) {
-    this.getStudentByMssv(mssv); // Kiểm tra tồn tại trước
+  static async deleteStudent(mssv) {
+    // Kiểm tra tồn tại, tự động ném AppError(404) nếu không tìm thấy
+    this.getStudentByMssv(mssv);
+
     const result = StudentModel.delete(mssv);
+
+    try {
+      await fetch(`${GATEWAY_URL}/api/registrations/by-student/${mssv}`, {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Lỗi đồng bộ xóa sinh viên';
+      console.error('[StudentService] Lỗi đồng bộ xóa sinh viên qua Gateway:', message);
+    }
+
     return result.changes > 0;
   }
 }

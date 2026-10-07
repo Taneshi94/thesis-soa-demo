@@ -1,0 +1,129 @@
+==============================================================================
+THESIS SOA API GATEWAY - POSTMAN TEST SUITE SPECIFICATION (21 STEPS)
+==============================================================================
+
+1. POST Create Student (Tạo sinh viên mới)
+	URL: {{base_url}}/api/students
+	Body:
+	{
+		"mssv": "SV{{$randomInt}}",
+		"hoTen": "{{$randomFullName}}",
+		"lop": "CNTT-K46",
+		"email": "student_{{$timestamp}}@gmail.com",
+		"soDienThoai": "09{{$randomInt}}"
+	}
+	Kết quả: Postman tự lưu current_mssv.
+
+2. GET All Students (Xem tất cả sinh viên)
+	URL: {{base_url}}/api/students
+
+3. GET Student by MSSV (Xem sinh viên mới tạo)
+	URL: {{base_url}}/api/students/{{current_mssv}}
+
+4. POST Create Topic (Tạo đề tài mới)
+	URL: {{base_url}}/api/topics
+	Body:
+	{
+		"maDeTai": "DT{{$randomInt}}",
+		"tenDeTai": "Nghiên cứu {{$randomCatchPhrase}}",
+		"moTa": "Mô tả đề tài {{$randomWord}}",
+		"giangVienHuongDan": "TS. {{$randomFullName}}",
+		"trangThai": "ConMo"
+	}
+	Kết quả: Postman tự lưu current_maDeTai.
+
+5. GET All Topics (Xem tất cả đề tài)
+	URL: {{base_url}}/api/topics
+
+6. GET Topic by ID (Xem đề tài mới tạo)
+	URL: {{base_url}}/api/topics/{{current_maDeTai}}
+
+7. PUT Update Student (Sửa thông tin sinh viên mới tạo)
+	URL: {{base_url}}/api/students/{{current_mssv}}
+	Body:
+	{
+		"hoTen": "{{$randomFullName}}",
+		"lop": "CNTT-K46-Update",
+		"email": "updated_{{$timestamp}}@gmail.com",
+		"soDienThoai": "0988888888"
+	}
+
+8. PUT Update Topic (Sửa thông tin đề tài mới tạo)
+	URL: {{base_url}}/api/topics/{{current_maDeTai}}
+	Body:
+	{
+		"tenDeTai": "Đề tài đã cập nhật",
+		"moTa": "Mô tả mới",
+		"giangVienHuongDan": "GS. Nguyen Van A"
+	}
+
+9. POST Create Registration (Đăng ký SV002 với đề tài mới tạo)
+	URL: {{base_url}}/api/registrations
+	Body:
+	{
+		"mssv": "SV002",
+		"maDeTai": "{{current_maDeTai}}"
+	}
+	Kết quả: Postman tự động lưu current_maDangKy.
+
+10. PUT Update Registration (Cập nhật mã đề tài của DK001 thành DT002)
+	URL: {{base_url}}/api/registrations/DK001
+	Body:
+	{
+		"maDeTai": "DT002"
+	}
+
+11. GET Registration by ID (Xem đăng ký vừa tạo ở bước 9)
+	URL: {{base_url}}/api/registrations/{{current_maDangKy}}
+
+12. PUT Update Registration (Cập nhật mã sinh viên của DK001 thành mã sinh viên mới tạo)
+	URL: {{base_url}}/api/registrations/DK001
+	Body:
+	{
+		"mssv": "{{current_mssv}}"
+	}
+
+13. PUT Update Student (Cập nhật lại thông tin sinh viên mới tạo)
+	URL: {{base_url}}/api/students/{{current_mssv}}
+	Body:
+	{
+		"hoTen": "Đinh Duy Thái",
+		"email": "thai@gmail.com",
+		"soDienThoai": "0912345678"
+	}
+
+14. PUT Update Topic (Cập nhật lại thông tin đề tài mới tạo)
+	URL: {{base_url}}/api/topics/{{current_maDeTai}}
+	Body:
+	{
+		"tenDeTai": "Đề tài cập nhật lần 2",
+		"moTa": "Mô tả cập nhật lần 2",
+		"giangVienHuongDan": "TS. Tran Van B"
+	}
+
+15. GET All Registrations (Xem tất cả đăng ký)
+	URL: {{base_url}}/api/registrations
+
+16. POST Create Registration (Tạo thêm đăng ký SV001 với DT001)
+	URL: {{base_url}}/api/registrations
+	Body:
+	{
+		"mssv": "SV001",
+		"maDeTai": "DT001"
+	}
+	Kết quả: Postman cập nhật current_maDangKy.
+
+17. DELETE Registration (Xóa đăng ký vừa tạo ở bước 16)
+	URL: {{base_url}}/api/registrations/{{current_maDangKy}}
+
+18. DELETE Topic (Xóa đề tài mới tạo)
+	URL: {{base_url}}/api/topics/{{current_maDeTai}}
+
+19. DELETE Student (Xóa sinh viên mới tạo)
+	URL: {{base_url}}/api/students/{{current_mssv}}
+
+20. GET All Registrations (Xem tất cả đăng ký để đối soát dữ liệu cuối cùng)
+	URL: {{base_url}}/api/registrations
+
+21. GET All Topics (Xem tất cả Topic cuối cùng)
+	URL: {{base_url}}/api/topics

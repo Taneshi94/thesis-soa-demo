@@ -1,113 +1,76 @@
 const StudentService = require('../services/studentService');
+const { asyncHandler } = require('../errorHandler');
 
 class StudentController {
   /**
-   * Lấy danh sách toàn bộ sinh viên
+   * 1. Lấy danh sách toàn bộ sinh viên
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
-  static getAll(req, res) {
-    try {
-      const students = StudentService.getAllStudents();
-      return res.status(200).json({
-        success: true,
-        data: students
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi hệ thống khi lấy danh sách sinh viên';
-      return res.status(500).json({
-        success: false,
-        message
-      });
-    }
-  }
+  static getAll = asyncHandler(async (req, res) => {
+    const students = StudentService.getAllStudents();
+    res.status(200).json({
+      success: true,
+      data: students
+    });
+  });
 
   /**
-   * Lấy thông tin sinh viên theo MSSV
+   * 2. Lấy thông tin sinh viên theo MSSV
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
-  static getByMssv(req, res) {
-    try {
-      const mssv = String(req.params.mssv);
-      const student = StudentService.getStudentByMssv(mssv);
-      return res.status(200).json({
-        success: true,
-        data: student
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Không tìm thấy sinh viên';
-      return res.status(404).json({
-        success: false,
-        message
-      });
-    }
-  }
+  static getByMssv = asyncHandler(async (req, res) => {
+    const mssv = String(req.params.mssv);
+    const student = StudentService.getStudentByMssv(mssv);
+    res.status(200).json({
+      success: true,
+      data: student
+    });
+  });
 
   /**
-   * Tạo mới sinh viên
+   * 3. Tạo mới sinh viên
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
-  static create(req, res) {
-    try {
-      const newStudent = StudentService.createStudent(req.body);
-      return res.status(201).json({
-        success: true,
-        data: newStudent
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi tạo sinh viên';
-      return res.status(400).json({
-        success: false,
-        message
-      });
-    }
-  }
+  static create = asyncHandler(async (req, res) => {
+    const newStudent = StudentService.createStudent(req.body);
+    res.status(201).json({
+      success: true,
+      data: newStudent
+    });
+  });
 
   /**
-   * Cập nhật thông tin sinh viên
+   * 4. Cập nhật thông tin sinh viên
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
-  static update(req, res) {
-    try {
-      const mssv = String(req.params.mssv);
-      const updatedStudent = StudentService.updateStudent(mssv, req.body);
-      return res.status(200).json({
-        success: true,
-        data: updatedStudent
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi cập nhật sinh viên';
-      return res.status(400).json({
-        success: false,
-        message
-      });
-    }
-  }
+  static update = asyncHandler(async (req, res) => {
+    const mssv = String(req.params.mssv);
+    // Bắt buộc có await vì updateStudent là hàm async
+    const updatedStudent = await StudentService.updateStudent(mssv, req.body);
+    res.status(200).json({
+      success: true,
+      data: updatedStudent
+    });
+  });
 
   /**
-   * Xóa sinh viên
+   * 5. Xóa sinh viên
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
-  static delete(req, res) {
-    try {
-      const mssv = String(req.params.mssv);
-      StudentService.deleteStudent(mssv);
-      return res.status(200).json({
-        success: true,
-        message: `Xóa sinh viên ${mssv} thành công`
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi xóa sinh viên';
-      return res.status(400).json({
-        success: false,
-        message
-      });
-    }
-  }
+  static delete = asyncHandler(async (req, res) => {
+    const mssv = String(req.params.mssv);
+    // Bắt buộc có await vì deleteStudent là hàm async
+    await StudentService.deleteStudent(mssv);
+    res.status(200).json({
+      success: true,
+      message: `Xóa sinh viên ${mssv} thành công`
+    });
+  });
 }
 
 module.exports = StudentController;

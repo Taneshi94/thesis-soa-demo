@@ -14,11 +14,15 @@ router.post('/', RegistrationController.create);
 // 4. Cập nhật thông tin phiếu đăng ký
 router.put('/:maDangKy', RegistrationController.update);
 
-// 5. Xóa phiếu đăng ký
+// 5. Xóa phiếu đăng ký theo mã
 router.delete('/:maDangKy', RegistrationController.delete);
 
-// 6. Route đồng bộ dữ liệu từ các service khác
+// 6. API Đồng bộ tên (Sinh viên / Đề tài) từ các service khác
 router.patch('/sync-student/:mssv', RegistrationController.syncStudent);
 router.patch('/sync-topic/:maDeTai', RegistrationController.syncTopic);
+
+// 7. API Cascade Delete (Xóa phiếu đăng ký khi SV hoặc Đề tài bị xóa)
+router.delete('/by-student/:mssv', RegistrationController.syncDeleteByStudent);
+router.delete('/by-topic/:maDeTai', RegistrationController.syncDeleteByTopic);
 
 module.exports = router;

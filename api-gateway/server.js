@@ -1,15 +1,19 @@
 const express = require('express');
+const cors = require('cors');
 const serviceRegistry = require('./config/serviceRegistry');
 const proxyRoutes = require('./routes/proxyRoutes');
 
 const app = express();
-const PORT = 3000; // Cố định Port 3000, không sử dụng dotenv
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+// 1. Enable CORS cho Gateway để Client/Frontend gọi được
+app.use(cors());
 
-// Tự động kiểm tra trạng thái hoạt động (ONLINE/OFFLINE) của các Microservices
+// LƯU Ý: Không dùng express.json() ở đây để tránh nghẽn/mất Stream Body khi qua express-http-proxy
+
+// 2. Kiểm tra trạng thái hoạt động chạy SONG SONG (Promise.allSettled)
 async function checkServicesHealth() {
-  for (const service of Object.values(serviceRegistry)) {
+  const healthChecks = Object.values(serviceRegistry).map(async (service) => {
     try {
       const response = await fetch(service.healthUrl, {
         method: 'GET',
@@ -19,15 +23,27 @@ async function checkServicesHealth() {
     } catch {
       service.status = 'OFFLINE';
     }
-  }
+  });
+
+  await Promise.allSettled(healthChecks);
 }
 
 // Chạy kiểm tra ngay khi khởi tạo và quét định kỳ mỗi 15 giây
 checkServicesHealth();
 setInterval(checkServicesHealth, 15000);
 
-// Nối router điều hướng vào ứng dụng
+// 3. Nối router điều hướng proxy
 app.use('/', proxyRoutes);
+
+// 4. Centralized Error Handler cho Gateway
+app.use((err, req, res, next) => {
+  console.error('[API Gateway Error]:', err.message);
+  res.status(500).json({
+    success: false,
+    message: 'Lỗi xử lý hệ thống tại API Gateway',
+    error: err.message
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`[API Gateway] Server đang chạy tại http://localhost:${PORT}`);
