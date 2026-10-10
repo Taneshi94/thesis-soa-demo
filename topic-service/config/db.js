@@ -44,7 +44,7 @@ if (count && count.count === 0) {
       tenDeTai: 'Xây dựng hệ thống Đồ án Tốt nghiệp theo SOA',
       moTa: 'Phân tích và triển khai kiến trúc SOA/Microservices với Express.js',
       giangVienHuongDan: 'TS. Nguyễn Văn C',
-      trangThai: 0
+      trangThai: 1
     },
     {
       maDeTai: 'DT002',
